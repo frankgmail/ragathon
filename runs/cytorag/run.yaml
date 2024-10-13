@@ -6,7 +6,7 @@ tags:
   - LLM
   - Chatbot
 resources:
-  cluster: essl-oci-sanjose
+  cluster: vessl-oci-sanjose
   preset: gpu-l4-small-spot
 image: quay.io/vessl-ai/cuda:12.4-r3
 import:
