@@ -7,7 +7,7 @@ tags:
   - Chatbot
 resources:
   cluster: vessl-oci-sanjose
-  preset: gpu-l4-small-spot
+  preset: gpu-a10-small
 image: quay.io/vessl-ai/cuda:12.4-r3
 import:
   /code/:
