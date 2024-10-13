@@ -18,7 +18,7 @@ system_prompt_template = "You are a helpful AI assistant. Use the following piec
 uploaded_files = []
 
 # Parse command-line arguments
-parser = argparse.ArgumentParser(description="Chat-with-document demo")
+parser = argparse.ArgumentParser(description="CytoRAG")
 parser.add_argument("--llama-parse-api-key", required=False, help="LlamaCloud API Key")
 parser.add_argument("--pinecone-api-key", required=False, help="Pinecone API Key")
 parser.add_argument("--openai-api-base", default="https://api.openai.com/v1", help="Base URL of OpenAI-compatible API")
@@ -246,29 +246,23 @@ footer {visibility: hidden}
 """
 
 # Gradio interface
-with gr.Blocks(css=css, fill_height=True, title="🦙 Chat-with-document demo with LlamaIndex and Pinecone") as demo:
-    gr.Markdown("# 🦙 Chat-with-document Demo with LlamaIndex and Pinecone!")
-
+with gr.Blocks(css=css, fill_height=True, title="CytoRAG : Cell Biology LlamaIndex, Pinecone and Arize Phoenix on Vessl") as demo:
+    gr.Markdown("# CytoRAG : Cell Biology LlamaIndex, Pinecone and Arize Phoenix on Vessl ")
     gr.Markdown("""
-    Parse PDF documents and chat with an AI about the content using LlamaParse, Pinecone, and self-hosted LLMs!
+    A RAG Copilot for BioMedical Researchers with Domain Expertise from NIH.PubMed scientific literature !
 
-    * Instructions:
-      1. **Chat Tab**: Ask questions about the ingested documents and receive AI-generated responses.
-      2. **Document Tab**: Upload and ingest PDF documents into the vector database using LlamaParse.
-      3. **Vector Browser Tab**: Search for specific information in the Pinecone vector database or remove entries.
-      4. **Settings Tab**: Configure your API keys and system prompts.
     """)
 
-    with gr.Tab("Chat", elem_id="chat-container"):
+    with gr.Tab("CytoRAG", elem_id="chat-container"):
         gr.ChatInterface(handle_chat)
 
-    with gr.Tab("Document"):
+    with gr.Tab("Medical Document"):
         with gr.Row():
             with gr.Column(scale=1):
                 uploaded_files_view = gr.Files(label="Uploaded Files", interactive=False, value=uploaded_files)
             with gr.Column(scale=3):
-                file_input = gr.File(label="Upload PDF", file_count="multiple")
-        parse_button = gr.Button("Parse and Ingest")
+                file_input = gr.File(label="Upload Medical PDF", file_count="multiple")
+        parse_button = gr.Button("Parse, Ingest and Vectorize")
         parse_error_msg = gr.Textbox(label="Error Message", visible=False, value="", lines=10)
 
     with gr.Tab("Vector Browser"):
@@ -282,28 +276,6 @@ with gr.Blocks(css=css, fill_height=True, title="🦙 Chat-with-document demo wi
             interactive=False
         )
         vector_search_error_msg = gr.Textbox(label="Error Message", visible=False, value="", lines=10)
-
-    with gr.Tab("Settings", elem_id="settings-container"):
-        with gr.Group():
-            gr.Markdown("### 🦙 LlamaCloud Settings\n\t* Obtain an API key from the [LlamaCloud dashboard]( ttps://cloud.llamaindex.ai/api-key).")
-            llama_parse_api_key = gr.Textbox(label="LlamaCloud API Key", value=args.llama_parse_api_key)
-
-        with gr.Group():
-            gr.Markdown("### 🌲 Pinecone Settings\n\t* Retrieve an API key from the [Pinecone console](https://app.pinecone.io/organizations/-/projects/-/keys).")
-            gr.Markdown
-            pinecone_api_key = gr.Textbox(label="Pinecone API Key", value=args.pinecone_api_key)
-            pinecone_region = gr.Textbox(label="Pinecone Region", value=args.pinecone_region)
-            pinecone_index_name = gr.Textbox(label="Pinecone Index Name", value=args.pinecone_index_name)
-
-        with gr.Group():
-            gr.Markdown("### 🧠 LLM Settings\n\t* For OpenAI: Obtain an API key from [OpenAI's API Key page](https://platform.openai.com/api-keys). For OpenAI-compatible endpoints (e.g., vLLM, TGI), update the API Base URL and key accordingly.")
-            openai_api_base = gr.Textbox(label="OpenAI-compatible API Base URL", value=args.openai_api_base)
-            openai_api_model = gr.Textbox(label="LLMs to use", value=args.openai_api_model)
-            openai_api_key = gr.Textbox(label="OpenAI-compatible API Key", value=args.openai_api_key)
-            prompt_input = gr.Textbox(label="Prompt Template", value=system_prompt_template, lines=5)
-
-        update_settings_button = gr.Button("Update")
-        update_settings_error_msg = gr.Textbox(label="Error Message", visible=False, value="", lines=10)
 
     parse_button.click(
         start_parse, outputs=[parse_button]
@@ -321,13 +293,6 @@ with gr.Blocks(css=css, fill_height=True, title="🦙 Chat-with-document demo wi
         browse_vectors,
         inputs=[search_input],
         outputs=[vector_output, vector_search_error_msg]
-    )
-    update_settings_button.click(
-        start_update, outputs=[update_settings_button]
-    ).then(
-        update_settings,
-        inputs=[llama_parse_api_key, pinecone_api_key, pinecone_region, pinecone_index_name, openai_api_base, openai_api_model, openai_api_key, prompt_input],
-        outputs=[update_settings_button, update_settings_error_msg]
     )
 
 if __name__ == "__main__":
